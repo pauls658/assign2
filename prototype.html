@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+    	<meta charset="utf-8" />
+		<title>Interactive Wireframe Prototype</title>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+		<script src="//code.jquery.com/jquery-latest.min.js"></script>
+		<script src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+		<style>
+			body
+			{
+				margin:0;
+				padding:0;
+			}
+		
+			.container
+			{
+				width:960px;
+				height:720px;
+				
+				margin-left:auto;margin-right:auto;
+				padding:8px;
+			}
+			
+			.ui-dialog .ui-dialog-content
+			{
+				padding:0px;
+			}
+			
+			label
+			{
+				display:inline-block;
+			}
+			
+			input[type="text"],
+			input[type="password"],	
+			select,
+			textarea
+			{
+				display:block;
+			}
+			
+			ul
+			{			
+				list-style:none;
+				margin:0;
+				padding:0;
+			}
+			
+			.important
+			{
+				color:red;
+				font-weight:bold;
+			}
+			
+			#menu > li
+			{
+				display:inline-block;
+				margin-left:16px;
+			}
+			
+			table
+			{
+				width:100%;
+				height:100%;
+			}
+			
+			#loggedModules th
+			{
+				border:1px solid black;
+				background:#ccc;
+			}
+			
+			#loggedModules td
+			{
+				border:1px solid black;
+			}
+			
+			#coordinates th
+			{
+				border:1px solid black;
+				background:#ccc;
+			}
+			
+			#coordinates td
+			{
+				border:1px solid black;
+			}
+			
+			canvas
+			{
+				border:1px solid black;
+			}
+		</style>
+		<script>
+			$(function() 
+			{
+				$("#loginForm").dialog(
+				{
+					buttons:
+					{
+						"Login": function()
+						{
+							$(this).dialog("close");
+							$("#marsForm").dialog("open");
+						},
+					},
+					modal: true
+				});
+				
+				$("#marsForm").dialog(
+				{
+					autoOpen: false,
+// 					minWidth: 960,
+					modal: true,
+					resizable: true
+				});
+				
+				$("#tabs").tabs(
+				{
+					disabled: [ 2 ]
+				});
+				
+				var configsAvailable = false;
+				
+				$("#log").on("click", function()
+				{
+					if ( configsAvailable == false )
+					{
+						var text = $("#configurationsTab").text();
+						
+						$("#configurationsTab").html('<span class="important">!</span> ' + text);
+						
+						configsAvailable = true;
+					}
+				});
+				
+				$("#calculateRoverPath").on("click", function()
+				{
+					$("#tabs").tabs("option", "disabled", false);
+				});
+				
+				var display = $("#display");
+				var context = display.get(0).getContext("2d");
+				
+				var grid = 
+				[
+					[ 3 ], 
+					[ 1, 2, 3, 5 ],
+					[ 0, 1, 2, 3, 4, 5, 6 ],
+					[ 0, 1, 2, 3, 4, 5, 6 ],
+					[ 0, 1, 5, 6 ],
+					[ 0, 1, 5, 6 ],
+					[ 1, 5 ],
+					[ 0, 1, 5, 6 ],
+					[ 1, 5 ],
+				];
+				
+				for ( var x = 0; x < grid.length; x++ )
+				{			
+					for ( var i = 0; i < grid[x].length; i++ )
+					{
+						var y = grid[x][i];
+					
+						context.beginPath();
+						context.rect(32 * ( x + 1 ), 32 * ( y + 1 ), 32, 32);
+						context.lineWidth = 1;
+						context.strokeStyle = "black";
+						context.stroke();
+					}
+				}
+				
+				var canvas = $("#roverPath");
+				var context = canvas.get(0).getContext("2d");
+				
+				var coordinates = 
+				[
+					{ x: 10, y: 18 },
+					{ x: 109, y: 46 },
+					{ x: 54, y: 67 },
+					{ x: 77, y: 79 },
+					{ x: 430, y: 103 },
+					{ x: 222, y: 165 },
+				];
+
+				for ( var i = 0; i < coordinates.length - 1; i++ )
+				{
+					var x = coordinates[i].x;
+					var y = coordinates[i].y;
+				
+					context.beginPath();
+					context.moveTo(x, y);
+					context.lineTo(coordinates[i + 1].x, coordinates[i + 1].y);
+					context.stroke();
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div id="loginForm" title="Login">
+				<form>
+					<fieldset>
+						<label>
+							Username:
+							<input class="text ui-widget-content ui-corner-all" name="username" type="text" />
+						</label>
+						<label>
+							Password:
+							<input class="text ui-widget-content ui-corner-all" name="password" type="password" />
+						</label>
+					</fieldset>
+				</form>
+			</div>
+			
+			<div id="marsForm" title="Mars">
+				<ul id="menu">
+					<li><a href="#">File</a></li>
+					<li><a href="#">Edit</a></li>
+					<li><a href="#">View</a></li>
+					<li><a href="#">Help</a></li>
+				</ul>
+				<div id="tabs">
+					<ul>
+						<li><a href="#tabs-1">Log Module</a></li>
+						<li><a id="configurationsTab" href="#tabs-2">Configurations</a></li>
+						<li><a href="#tabs-3">Rover Path</a></li>
+					</ul>
+					<div id="tabs-1">
+						<form>
+							<fieldset>
+								<legend>Module Type</legend>
+								<label>
+									<select name="moduleType">
+										<option value="airlock">Airlock</option>
+										<option value="control">Control</option>
+										<option value="power">Power</option>
+										<option value="foodAndWater">Food and Water</option>
+										<option value="dormitory">Dormitory</option>
+										<option value="canteen">Canteen</option>
+										<option value="sanitation">Sanitation</option>
+										<option value="gym">Gym</option>
+										<option value="plain">Plain</option>
+										<option value="medical">Medical</option>
+										<option value="rover">Rover</option>
+										<option value="solarPanels">Solar Panels</option>
+										<option value="communication">Communication</option>
+									</select>
+								</label>
+							</fieldset>
+							<fieldset>
+								<legend>Module ID</legend>
+								<label>
+									<input class="text ui-widget-content ui-corner-all" name="moduleID" type="text" />
+								</label>
+							</fieldset>
+							<fieldset>
+								<legend>Condition</legend>
+								<ul id="conditions">
+									<li>
+										<label>
+											<input class="" name="condition[]" type="radio" value="usable" />
+											Usable
+										</label>
+									</li>
+									<li>
+										<label>
+											<input class="" name="condition[]" type="radio" value="usableAfterRepair" />
+											Usable After Repair
+										</label>
+									</li>
+									<li>
+										<label>
+											<input class="" name="condition[]" type="radio" value="unusable" />
+											Unusable
+										</label>
+									</li>
+								</ul>
+							</fieldset>
+							<fieldset>
+								<legend>Orientation</legend>
+								<ul id="orientations">
+									<li>
+										<label>
+											<input class="" name="orientation" type="radio" value="0" checked />
+											0
+										</label>
+									</li>
+									<li>
+										<label>
+											<input class="" name="orientation" type="radio" value="0" />
+											1
+										</label>
+									</li>
+									<li>
+										<label>
+											<input class="" name="orientation" type="radio" value="0" />
+											2
+										</label>
+									</li>
+								</ul>
+							</fieldset>
+							<fieldset>
+								<legend>Coordinates</legend>
+								<label>
+									X
+									<input class="text ui-widget-content ui-corner-all" name="coordinateX" type="text" />
+								</label>
+								<label>
+									Y
+									<input class="text ui-widget-content ui-corner-all" name="coordinateY" type="text" />
+								</label>
+							</fieldset>
+							<fieldset>
+								<legend>Additional Comments</legend>
+								<label>									
+									<textarea></textarea>
+								</label>
+							</fieldset>
+							<fieldset>
+								<input type="button" value="Clear" />
+								<input id="log" type="button" value="Log" />
+							</fieldset>
+						</form>
+					</div>
+					<div id="tabs-2">
+						<table>
+							<tbody>
+								<tr>
+									<td>
+										<table id="loggedModules">
+											<thead>
+												<tr>
+													<th>Logged Modules</th><th>Logged / Total</th>
+												</tr>
+											</thead>
+											<tfoot>
+											</tfoot>
+											<tbody>
+												<tr>
+													<td>Airlock</td><td>2 / 4</td>
+												</tr>
+												<tr>
+													<td>Control</td><td>2 / 4</td>
+												</tr>
+												<tr>
+													<td>Power</td><td>1 / 4</td>
+												</tr>
+												<tr>
+													<td>Food and Water</td><td>6 / 10</td>
+												</tr>
+												<tr>
+													<td>Dormitory</td><td>12 / 20</td>
+												</tr>
+												<tr>
+													<td>Canteen</td><td>3 / 4</td>
+												</tr>
+												<tr>
+													<td>Sanitation</td><td>3 / 10</td>
+												</tr>
+												<tr>
+													<td>Gym</td><td>4 / 4</td>
+												</tr>
+												<tr>
+													<td>Plain</td><td>30 / 40</td>
+												</tr>
+												<tr>
+													<td>Medical</td><td>1 / 4</td>
+												</tr>
+												<tr>
+													<td>Rover</td><td>1 / 1</td>
+												</tr>
+												<tr>
+													<td>Solar Panels</td><td>10 / 10</td>
+												</tr>
+												<tr>
+													<td>Communication</td><td>0 / 2</td>
+												</tr>
+											</tbody>
+										</table>
+									</td>
+									<td>
+										<table id="configurations">
+											<thead>
+												<tr>
+													<th>Configs.</th>
+													<th>Display</th>
+												</tr>
+											</thead>
+											<tfoot>
+											</tfoot>
+											<tbody>
+												<tr>
+													<td>
+														<form>
+															<select multiple size="14">
+																<option value="firstPossible">First possible</option>
+																<option value="optimal1" selected>Optimal 1</option>
+																<option value="optimal2">Optimal 2</option>
+																<option value="subOptimal">Sub-optimal</option>
+															</select>
+														</form>														
+														<input id="calculateRoverPath" type="button" value="Rover Path" />
+													</td>
+													<td>
+														<canvas id="display" width="349" height="364"></canvas>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+										
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div id="tabs-3">
+						<table>
+							<tbody>
+								<tr>
+									<td style="width:25%;">
+										<table id="coordinates">
+											<thead>
+												<tr>
+													<th>ID</th><th>X</th><th>Y</th>
+												</tr>
+											</thead>
+											<tfoot>
+											</tfoot>
+											<tbody>
+												<tr>
+													<td>1</td><td>10</td><td>18</td>
+												</tr>
+												<tr>
+													<td>2</td><td>109</td><td>46</td>
+												</tr>
+												<tr>
+													<td>3</td><td>54</td><td>67</td>
+												</tr>
+												<tr>
+													<td>4</td><td>77</td><td>79</td>
+												</tr>
+												<tr>
+													<td>5</td><td>430</td><td>103</td>
+												</tr>
+												<tr>
+													<td>6</td><td>222</td><td>165</td>
+												</tr>
+											</tbody>
+										</table>
+									</td>
+									<td style="width:75%;">
+										<canvas id="roverPath" width="671" height="200"></canvas>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
