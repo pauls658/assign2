@@ -156,6 +156,19 @@
 					[ 1, 5 ],
 				];
 				
+				var gridLetters =
+				[
+					['n', 'n', 'n', 'A'],
+					['n', 'D', 'F', 'S', 'n', 'D'],
+					['D', 'P', 'P', 'P', 'P', 'P', 'D'],
+					['D', 'P', 'S', 'A', 'S', 'P', 'D'],
+					['D', 'P', 'n', 'n', 'n', 'P', 'D'],
+					['D', 'P', 'n', 'n', 'n', 'P', 'D'],
+					['n', 'P', 'n', 'n', 'n', 'P'],
+					['E', 'P', 'n', 'n', 'n', 'P', 'E'],
+					['n', 'A', 'n', 'n', 'n', 'A']
+				]
+				
 				for ( var x = 0; x < grid.length; x++ )
 				{			
 					for ( var i = 0; i < grid[x].length; i++ )
@@ -167,6 +180,14 @@
 						context.lineWidth = 1;
 						context.strokeStyle = "black";
 						context.stroke();
+					}
+				}
+				
+				for (var x = 0; x < gridLetters.length; x++) {
+					for (var y = 0; y < gridLetters[x].length; y++) {
+						var letter = gridLetters[x][y];
+						if (letter != 'n')
+							context.fillText(letter, 32*(x+1)+12, 32*(y+1)+20);
 					}
 				}
 				
@@ -189,9 +210,12 @@
 					var y = coordinates[i].y;
 				
 					context.beginPath();
-					context.moveTo(x, y);
+					context.moveTo(x, y);						
+					context.fillText(i + 1, x, y);
 					context.lineTo(coordinates[i + 1].x, coordinates[i + 1].y);
 					context.stroke();
+					if (i == coordinates.length - 2)
+						context.fillText(i + 2, coordinates[i + 1].x, coordinates[i + 1].y - 6);
 				}
 			});
 		</script>
@@ -213,7 +237,7 @@
 				</form>
 			</div>
 			
-			<div id="marsForm" title="Mars">
+			<div id="marsForm" title="MERS">
 				<ul id="menu">
 					<li><a href="#">File</a></li>
 					<li><a href="#">Edit</a></li>
@@ -228,26 +252,6 @@
 					</ul>
 					<div id="tabs-1">
 						<form>
-							<fieldset>
-								<legend>Module Type</legend>
-								<label>
-									<select name="moduleType">
-										<option value="airlock">Airlock</option>
-										<option value="control">Control</option>
-										<option value="power">Power</option>
-										<option value="foodAndWater">Food and Water</option>
-										<option value="dormitory">Dormitory</option>
-										<option value="canteen">Canteen</option>
-										<option value="sanitation">Sanitation</option>
-										<option value="gym">Gym</option>
-										<option value="plain">Plain</option>
-										<option value="medical">Medical</option>
-										<option value="rover">Rover</option>
-										<option value="solarPanels">Solar Panels</option>
-										<option value="communication">Communication</option>
-									</select>
-								</label>
-							</fieldset>
 							<fieldset>
 								<legend>Module ID</legend>
 								<label>
